@@ -1,9 +1,10 @@
-package frc.robot.DriveFiles;
+package frc.robot.Subsystems;
 
 import java.util.Optional;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -11,27 +12,29 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.constants_Auto;
+import frc.robot.Constants.constants_Limelight;
 import frc.robot.LimelightHelpers.LimelightResults;
 
 import java.util.function.*;
 
-public class LimelightSubsystem extends SubsystemBase{
+public class Limelight extends SubsystemBase{
     
-public SwerveSubsystem s_swerve;
+public Swerve s_swerve;
 public NetworkTable networkTables;
 public IntegerSubscriber pipeline;
 public IntegerPublisher pipelinePublisher;
-public double xAng, yAng, ySpeed, xSpeed, turningSpeed, targetID, targetArea, correctionX, correctionZ, correctionT, distanceX, distanceY, yAngToRadians, xAngToRadians;
+public double xAng_Coral, yAng_Coral, ySpeed, xSpeed, turningSpeed, targetID_Coral, targetArea_Coral, correctionX, correctionZ, correctionT, distanceX, distanceY, yAngToRadians_Coral, xAngToRadians_Coral;
 public double[] localizedPose;
 public double[] botPose_targetSpace, targetPose_robotSpace;
 public ProfiledPIDController thetaPIDController;
 public ProfiledPIDController xPIDController, yPIDController;
-public boolean autoDriveToggle = false;
-public boolean hasTargets;
+public boolean autoDriveToggle;
+public boolean hasTargets_Coral;
 public BooleanSupplier interrupted;
-public String limelightName = "limelight";
+public String limelight_Coral = "limelight-coral";
+public String limelight_Tags = "liemlight-tags";
 
 public LimelightResults r_limelight;
 
@@ -42,33 +45,22 @@ public LimelightHelpers.PoseEstimate mt2;
 
 // public SlewRateLimiter tLimiter, xLimiter, zLimiter;
 
-    public LimelightSubsystem(SwerveSubsystem s_swerve){
+    public Limelight(Swerve s_swerve){
         this.s_swerve = s_swerve;
-        // NetworkTableInstance.getDefault().getTable("limelight").getEntry("<variablename>").getDouble(0);
         networkTables = NetworkTableInstance.getDefault().getTable("limelight");
         pipelinePublisher = networkTables.getIntegerTopic("limelight.getpipeline").publish();
         
         
-        thetaPIDController = new ProfiledPIDController(Constants.limelightConstants.thetakP, Constants.limelightConstants.thetakI, Constants.limelightConstants.thetakD, Constants.AutoConstants.kThetaControllerConstraints);
-        xPIDController = new ProfiledPIDController(Constants.limelightConstants.linearkP, Constants.limelightConstants.linearkI, Constants.limelightConstants.linearkD, Constants.AutoConstants.kLinearConstraints);
-        yPIDController = new ProfiledPIDController(Constants.limelightConstants.linearkP, Constants.limelightConstants.linearkI, Constants.limelightConstants.linearkD, Constants.AutoConstants.kLinearConstraints);
-        // tLimiter = new SlewRateLimiter(Constants.AutoConstants.kMaxAngularAccelerationUnitsPerSecond);
-        // xLimiter = new SlewRateLimiter(Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
-        // zLimiter = new SlewRateLimiter(Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
+        thetaPIDController = new ProfiledPIDController(constants_Limelight.thetakP, constants_Limelight.thetakI, constants_Limelight.thetakD, constants_Auto.kThetaControllerConstraints);
+        xPIDController = new ProfiledPIDController(constants_Limelight.linearkP, constants_Limelight.linearkI, constants_Limelight.linearkD, constants_Auto.kLinearConstraints);
+        yPIDController = new ProfiledPIDController(constants_Limelight.linearkP, constants_Limelight.linearkI, constants_Limelight.linearkD, constants_Auto.kLinearConstraints);
+        setPIDControllers();
 
-      setPIDControllers();
-
-        // LimelightHelpers.LimelightResults r_limelight = new LimelightResults();
-
-        // fieldLayout = new AprilTagFieldLayout(AprilTagFields.k2024Crescendo.);
-
-        // LimelightHelpers.SetRobotOrientation(limelightName, s_swerve.m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        // mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
     }
 
     public Optional<Pose2d> getPoseFromAprilTags() {
         double[] botpose = localizedPose;
-        if(botpose.length < 7 || targetID == -1) return Optional.empty();
+        if(botpose.length < 7 || targetID_Coral == -1) return Optional.empty();
         return Optional.of(new Pose2d(botpose[0], botpose[1], new Rotation2d(botpose[5])));
     }
   
@@ -76,13 +68,13 @@ public LimelightHelpers.PoseEstimate mt2;
     public void setPIDControllers()
     {
         thetaPIDController.setGoal(0);//radians
-        thetaPIDController.setTolerance(Math.toRadians(0.5)); //radians
+        thetaPIDController.setTolerance(Math.toRadians(1)); //radians
 
         xPIDController.setGoal(0);//meters
         xPIDController.setTolerance(0.1);//meters
 
         yPIDController.setGoal(1);//meters
-        yPIDController.setTolerance(0.0381);//meters
+        yPIDController.setTolerance(0.05);//meters
     }
 
     // public Command autoDrive = new Command() 
@@ -113,7 +105,7 @@ public LimelightHelpers.PoseEstimate mt2;
     
     public void updateDriveValues()
     {
-        turningSpeed = thetaPIDController.calculate(xAngToRadians); /*Rads / sec */
+        turningSpeed = thetaPIDController.calculate(xAngToRadians_Coral); /*Rads / sec */
         ySpeed = -1 * yPIDController.calculate(distanceY); /*m/sec */
     }
     public void resetDriveValues()
@@ -148,28 +140,26 @@ public LimelightHelpers.PoseEstimate mt2;
         public void initialize()
         {
             s_swerve.faceAllFoward();
-            autoDriveToggle = true;
         }
-
+        
         @Override
         public void execute()
         {
             updateDriveValues();
-
-            System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOO");
+            autoDriveToggle = true;
+            s_swerve.setModuleStates(new ChassisSpeeds(ySpeed, 0, turningSpeed));
         }
 
         @Override
         public boolean isFinished()
         {
-            return atGoal();
+            return atGoal() || !hasTargets_Coral;
         }
 
         @Override
         public void end(boolean interrupted)
         {
             autoDriveToggle = false;
-            System.out.println("AHHHHHHHHHHHHHHH");
         }
     };
 
@@ -180,20 +170,22 @@ public LimelightHelpers.PoseEstimate mt2;
         
         
         
-        // botPose_targetSpace = LimelightHelpers.getBotPose_TargetSpace(limelightName);
-        // targetPose_robotSpace = LimelightHelpers.getTargetPose_RobotSpace(limelightName);
-        // localizedPose = LimelightHelpers.getBotPose_wpiBlue(limelightName);
-        xAng = LimelightHelpers.getTX(limelightName);
-        xAngToRadians = Math.toRadians(xAng);
-        yAng = LimelightHelpers.getTY(limelightName);
-        yAngToRadians = Math.toRadians(yAng);
-        hasTargets = LimelightHelpers.getTV(limelightName);
-        // targetID = LimelightHelpers.getFiducialID(limelightName);
-        // targetArea = LimelightHelpers.getTA(limelightName);
+        // botPose_targetSpace = LimelightHelpers.getBotPose_TargetSpace(limelight_Coral);
+        // targetPose_robotSpace = LimelightHelpers.getTargetPose_RobotSpace(limelight_Coral);
+        // localizedPose = LimelightHelpers.getBotPose_wpiBlue(limelight_Coral);
+        xAng_Coral = LimelightHelpers.getTX(limelight_Coral);
+        xAngToRadians_Coral = Math.toRadians(xAng_Coral);
+        yAng_Coral = LimelightHelpers.getTY(limelight_Coral);
+        yAngToRadians_Coral = Math.toRadians(yAng_Coral);
+        hasTargets_Coral = LimelightHelpers.getTV(limelight_Coral);
+        // targetID = LimelightHelpers.getFiducialID(limelight_Coral);
+        // targetArea = LimelightHelpers.getTA(limelight_Coral);
         
-        distanceY = (((24 - Constants.limelightConstants.limelightHeight) / (Math.tan(Math.toRadians(yAng+Constants.limelightConstants.limelightAngle)))) + Constants.limelightConstants.limelightDistanceForward) * 0.0254; //meters from target to center of robot
-        distanceX = (Math.cos(Math.toRadians(distanceY/xAng))) * 0.0254;//meters to center of robot
+        distanceY = (((13 - constants_Limelight.Height_Coral) / (Math.tan(Math.toRadians(yAng_Coral+constants_Limelight.Angle_Coral)))) + constants_Limelight.DistanceForward_Coral) * 0.0254; //meters from target to center of robot
+        distanceX = (Math.cos(Math.toRadians(distanceY/xAng_Coral))) * 0.0254;//meters to center of robot
         
+        updateDriveValues();
+
         // xSpeed = -1 * xPIDController.calculate(correctionX); //m/sec
 
 
@@ -205,9 +197,10 @@ public LimelightHelpers.PoseEstimate mt2;
         SmartDashboard.putNumber("Turning Speed", turningSpeed);
         // SmartDashboard.putNumber("TA Value", targetArea);
         // SmartDashboard.putNumber("X Speed", xSpeed);
-        // SmartDashboard.putNumber("Y Speed", ySpeed);
-        SmartDashboard.putNumber("TX Value", xAng);
-        SmartDashboard.putNumber("TY Value", yAng);
+        SmartDashboard.putBoolean("Has Targets", hasTargets_Coral);
+        SmartDashboard.putNumber("Y Speed", ySpeed);
+        SmartDashboard.putNumber("TX Value", xAng_Coral);
+        SmartDashboard.putNumber("TY Value", yAng_Coral);
 
         SmartDashboard.putBoolean("autoDrive", autoDriveToggle);
 

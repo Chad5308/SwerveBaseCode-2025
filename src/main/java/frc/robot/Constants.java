@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final class DriveConstants {
+  public static final class constants_Drive {
 
     public static final Measure<DistanceUnit> wheelRadius = edu.wpi.first.units.Units.Inches.of(1.5);
     // public static final double wheelRadius = Units.inchesToMeters(1.5);
@@ -96,7 +96,7 @@ public final class Constants {
     public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 0.75;
   }
   
-  public static final class ModuleConstants {
+  public static final class constants_Module {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final double kDriveMotorGearRatio = 4.59 / 1; //4.59 for Swerve X, 6.75 for sds
     public static final double kTurningMotorGearRatio = 13.3714 / 1; //13.3714 for Swerve X, 12.8 for sds
@@ -109,11 +109,12 @@ public final class Constants {
     public static final double kPTurning = 0.0075;
     public static final double kITurning = 0.0;
     public static final double kDTurning = 0.75;
+    public static final double kFFTurning = 0;
 
-    public static final double moduleRadius = Units.inchesToMeters(Constants.DriveConstants.kTrackWidth/2); //measured from center of robot to furthest module.
+    public static final double moduleRadius = Units.inchesToMeters(Constants.constants_Drive.kTrackWidth/2); //measured from center of robot to furthest module.
   }
 
-  public static final class OIConstants {
+  public static final class constants_OI {
     public static final int kOPControllerPort = 0;
     public static final double kDeadband = 0.09;
     public static final int kLeftStickPort = 1;
@@ -122,7 +123,7 @@ public final class Constants {
  
 
   
-  public static final class AprilTagIds{ //[id num, height in inches, coordinate x, coordinate y, heading]
+  public static final class constants_AprilTags{ //[id num, height in inches, coordinate x, coordinate y, heading]
     public static final double[] blueSourceRight = {1, 53.375};
     public static final double[] blueSourceLeft = {2, 53.375};
     public static final double[] redSpeakerRight = {3, 57.125};
@@ -141,7 +142,7 @@ public final class Constants {
     public static final double[] blueStageSource = {16, 51.25};
   }
 
-  public static final class limelightConstants{
+  public static final class constants_Limelight{
     public static final double thetakP = 4;
     public static final double thetakI = 0.0002;
     public static final double thetakD = 0;
@@ -150,25 +151,30 @@ public final class Constants {
     public static final double linearkI = 0.001;
     public static final double linearkD = 0.05;
 
-    public static final double limelightAngle = 30;
-    public static final double limelightDistanceForward = 10.5; //inches
-    public static final double limelightDistanceRight = 2.5; //inches
-    public static final double limelightHeight = 10.5; //inches
+    public static final double Angle_Coral = -15;
+    public static final double DistanceForward_Coral = 5; //inches
+    public static final double DistanceRight_Coral = -3; //inches
+    public static final double Height_Coral = 23.75; //inches
+
+    public static final double Angle_Tags = 15;
+    public static final double DistanceForward_Tags = 3; //inches
+    public static final double DistanceRight_Tags = -3; //inches
+    public static final double Height_Tags = 24.5; //inches
   }
 
 
-  public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond/2;//0.5;
-    public static final double kMaxAccelerationMetersPerSecondSquared = DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond/2;//0.25;
-    public static final double kMaxAngularSpeedRadiansPerSecond =  DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
-    public static final double kMaxAngularAccelerationUnitsPerSecond = DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond;
+  public static final class constants_Auto {
+    public static final double kMaxSpeedMetersPerSecond = constants_Drive.kPhysicalMaxSpeedMetersPerSecond/2;//0.5;
+    public static final double kMaxAccelerationMetersPerSecondSquared = constants_Drive.kTeleDriveMaxAccelerationUnitsPerSecond/2;//0.25;
+    public static final double kMaxAngularSpeedRadiansPerSecond =  constants_Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+    public static final double kMaxAngularAccelerationUnitsPerSecond = constants_Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond;
 
-    public static  double kPTranslation = 5;
-    public static  double kITranslation = 0;
-    public static  double kDTranslation = 0;
+    public static  double kPTranslation = 3.0;
+    public static  double kITranslation = 0.1;
+    public static  double kDTranslation = 2;
 
-    public static final double kPTheta = 5;
-    public static final double kITheta = 0;
+    public static final double kPTheta = 4.5;
+    public static final double kITheta = 0.1;
     public static final double kDTheta = 0;
 
 
