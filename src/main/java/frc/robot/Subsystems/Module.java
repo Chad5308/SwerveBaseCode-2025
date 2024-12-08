@@ -69,7 +69,7 @@ public class Module extends SubsystemBase{
     // driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // drivePidController = driveMotor.getClosedLoopController();
     
-     driveMotor = new TalonFX(driveNum);
+     driveMotor = new TalonFX(driveNum, "rio");
      driveConfig = new TalonFXConfiguration();
      velocityRequest = new VelocityVoltage(0).withSlot(0);
      motionMagicRequest = new MotionMagicVelocityVoltage(0);
@@ -172,7 +172,7 @@ public class Module extends SubsystemBase{
 
   public void setDriveNeutralOutput()
   {
-    driveMotor.setControl(neutralOut); //TODO see if this is coast or brake
+    driveMotor.setControl(new NeutralOut()); //TODO see if this is coast or brake
   }
   
   
