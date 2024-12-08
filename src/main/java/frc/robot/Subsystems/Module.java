@@ -12,11 +12,8 @@ import com.revrobotics.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.*;
+import com.revrobotics.spark.config.*;
 import com.revrobotics.spark.config.ClosedLoopConfig.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -100,24 +97,18 @@ public class Module extends SubsystemBase{
     resetDrive();
   }
 
-
-
-public static SparkClosedLoopController getPIDController() {
-  return steerMotor.getClosedLoopController();
-}
-
-public void resetDrive() {
-  driveMotorEncoder.setPosition(0);
-  steerMotorEncoder.setPosition(0);
-}
-public void resetDriveEncoder() {
-  driveMotorEncoder.setPosition(0);
-}
-//stop method that stops the motors when the stick/s are within the deadzone < 0.01
-public void stop() {
-  driveMotor.set(0);
-  steerMotor.set(0);
-}
+  public void resetDrive() {
+    driveMotorEncoder.setPosition(0);
+    steerMotorEncoder.setPosition(0);
+  }
+  public void resetDriveEncoder() {
+    driveMotorEncoder.setPosition(0);
+  }
+  //stop method that stops the motors when the stick/s are within the deadzone < 0.01
+  public void stop() {
+    driveMotor.set(0);
+    steerMotor.set(0);
+  }
 
   public double getAbsoluteEncoderDeg(double AEOffset) {
     double angle = absoluteEncoder.getPosition().getValueAsDouble();
@@ -133,7 +124,7 @@ public void stop() {
     return driveMotorEncoder.getVelocity();
   }
   public double getSteerPosition() {
-     return Math.abs(steerMotorEncoder.getPosition() % 720);
+    return Math.abs(steerMotorEncoder.getPosition() % 720);
   }
   public double getSteerVelocity() {
     return steerMotorEncoder.getVelocity();
@@ -142,31 +133,30 @@ public void stop() {
     return driveMotorEncoder.getPosition();
   }
   
- 
   
-//Creating the current state of the modules. A drive velo and an angle are needed. We use an off set of -90 for the angle
-public SwerveModuleState gState() {
-    return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromDegrees(steerMotorEncoder.getPosition()));
-}
-public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(driveMotorEncoder.getPosition(), Rotation2d.fromDegrees(steerMotorEncoder.getPosition()));
-}
+  //Creating the current state of the modules. A drive velo and an angle are needed. We use an off set of -90 for the angle
+  public SwerveModuleState gState() {
+      return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromDegrees(steerMotorEncoder.getPosition()));
+  }
+  public SwerveModulePosition getPosition() {
+          return new SwerveModulePosition(driveMotorEncoder.getPosition(), Rotation2d.fromDegrees(steerMotorEncoder.getPosition()));
+  }
 
-//This is our setDesiredState alg. Takes the current state and the desired state shown by the controller and points the wheels to that 
-//location
-public void setDesiredState(SwerveModuleState state) {
-  if (Math.abs(state.speedMetersPerSecond) < 0.01) {stop();return;}
-  // state = SwerveModuleState.optimize(state, Rotation2d.fromDegrees(gState().angle.getDegrees()));
-  state.cosineScale(gState().angle);
-  driveMotor.set(state.speedMetersPerSecond / constants_Drive.kPhysicalMaxSpeedMetersPerSecond);
-  turningPidController.setReference(state.angle.getDegrees(), ControlType.kPosition);
-}
+  //This is our setDesiredState alg. Takes the current state and the desired state shown by the controller and points the wheels to that 
+  //location
+  public void setDesiredState(SwerveModuleState state) {
+    if (Math.abs(state.speedMetersPerSecond) < 0.01) {stop();return;}
+    // state = SwerveModuleState.optimize(state, Rotation2d.fromDegrees(gState().angle.getDegrees()));
+    state.cosineScale(gState().angle);
+    driveMotor.set(state.speedMetersPerSecond / constants_Drive.kPhysicalMaxSpeedMetersPerSecond);
+    turningPidController.setReference(state.angle.getDegrees(), ControlType.kPosition);
+  }
 
-public void wheelFaceForward(double AEOffset) {
-  steerMotorEncoder.setPosition(getAbsoluteEncoderDeg(AEOffset));
-  try{Thread.sleep(10);
-    turningPidController.setReference(0, ControlType.kPosition);
-  }catch (Exception e) {}}
+  public void wheelFaceForward(double AEOffset) {
+    steerMotorEncoder.setPosition(getAbsoluteEncoderDeg(AEOffset));
+    try{Thread.sleep(10);
+      turningPidController.setReference(0, ControlType.kPosition);
+    }catch (Exception e) {}}
 
 
 }
