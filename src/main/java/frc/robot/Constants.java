@@ -111,6 +111,13 @@ public final class Constants {
     public static final double kDTurning = 0.75;
     public static final double kFFTurning = 0;
 
+    public static final double kS_Drive = 0.4;
+    public static final double kV_Drive = 0.12;
+    public static final double kA_Drive = 0.1;
+    public static final double kP_Drive = 1.0;
+    public static final double kI_Drive = 0;
+    public static final double kD_Drive = 0.01;
+
     public static final double moduleRadius = Units.inchesToMeters(Constants.constants_Drive.kTrackWidth/2); //measured from center of robot to furthest module.
   }
 
