@@ -1,0 +1,6 @@
+{
+    "name": "Frame",
+    "disableSimplification": false,
+    "rotations": {"axis": "x" , "y" : "z", "degrees": 0 }[]
+
+}

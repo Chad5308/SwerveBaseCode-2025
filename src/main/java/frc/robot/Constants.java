@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.HashMap;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,6 +17,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.units.measure.*;
 
 
 
@@ -85,22 +89,28 @@ public final class Constants {
     public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
     public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-    public static final double kPhysicalMaxSpeedMetersPerSecond = 4.60248; //6.949 for Swerve X, 4.60248 for sd
-    public static final LinearVelocityUnit kMaxTestedSpeed = LinearVelocityUnit.combine(edu.wpi.first.units.Units.Meters.of(4.5).unit(), edu.wpi.first.units.Units.Seconds.of(1).unit());
-    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond =kPhysicalMaxSpeedMetersPerSecond/(kTrackWidth/2);
+    public static final boolean kInvertLeftSide = false;
+    public static final boolean kInvertRightSide = true;
 
+    // public static final double kPhysicalMaxSpeedMetersPerSecond = 4.60248; //6.949 for Swerve X, 4.60248 for sd
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(6.949);
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond =kSpeedAt12Volts.magnitude()/(kTrackWidth/2);
+    
     //For limiting speed while driving
-    public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 1.0;
+    public static final double kTeleDriveMaxSpeedMetersPerSecond = kSpeedAt12Volts.magnitude() / 1.0;
     public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 1.0;
     public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 2.0;
     public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 0.75;
+
+    public static final int kPigeonId = 15;
   }
   
   public static final class constants_Module {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final double kDriveMotorGearRatio = 4.59 / 1; //4.59 for Swerve X, 6.75 for sds
     public static final double kTurningMotorGearRatio = 13.3714 / 1; //13.3714 for Swerve X, 12.8 for sds
-    public static final double kDriveEncoderRot2Meter = 1/16.0344; //Not sure try 1/16.0344, 1/23.58 for sds
+    public static final double kDriveEncoderRot2Meter = 1/1; //Not sure try 1/16.0344, 1/23.58 for sds //TODO Make this equal to 1m/rotation
+    public static final double kCoupleRatio = 3.5;
     
     public static final double kTurningConversionFactor2Deg =  28.25;
     public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
@@ -119,6 +129,16 @@ public final class Constants {
     public static final double kD_Drive = 0.01;
 
     public static final double moduleRadius = Units.inchesToMeters(Constants.constants_Drive.kTrackWidth/2); //measured from center of robot to furthest module.
+  }
+
+  public static final class constants_Sim
+  {
+    // These are only used for simulation
+    public static final double kSteerInertia = 0.004;
+    public static final double kDriveInertia = 0.025;
+    // Simulated voltage necessary to overcome friction
+    public static final Voltage kSteerFrictionVoltage = Volts.of(0.25);
+    public static final Voltage kDriveFrictionVoltage = Volts.of(0.25);
   }
 
   public static final class constants_OI {
@@ -171,7 +191,7 @@ public final class Constants {
 
 
   public static final class constants_Auto {
-    public static final double kMaxSpeedMetersPerSecond = constants_Drive.kPhysicalMaxSpeedMetersPerSecond/2;//0.5;
+    public static final double kMaxSpeedMetersPerSecond = constants_Drive.kSpeedAt12Volts.magnitude()/2;//0.5;
     public static final double kMaxAccelerationMetersPerSecondSquared = constants_Drive.kTeleDriveMaxAccelerationUnitsPerSecond/2;//0.25;
     public static final double kMaxAngularSpeedRadiansPerSecond =  constants_Drive.kTeleDriveMaxAngularSpeedRadiansPerSecond;
     public static final double kMaxAngularAccelerationUnitsPerSecond = constants_Drive.kTeleDriveMaxAngularAccelerationUnitsPerSecond;

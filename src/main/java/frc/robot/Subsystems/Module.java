@@ -3,17 +3,29 @@ package frc.robot.Subsystems;
 import frc.robot.Constants;
 import frc.robot.Constants.constants_Drive;
 import frc.robot.Constants.constants_Module;
+import frc.robot.Constants.constants_Sim;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static edu.wpi.first.units.Units.Amps;
+
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.revrobotics.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -22,6 +34,7 @@ import com.revrobotics.spark.SparkBase.*;
 import com.revrobotics.spark.config.*;
 import com.revrobotics.spark.config.ClosedLoopConfig.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 
 
 
@@ -36,14 +49,22 @@ public class Module extends SubsystemBase{
   TalonFX driveMotor; 
   VelocityVoltage velocityRequest;
   MotionMagicVelocityVoltage motionMagicRequest;
-  TalonFXConfiguration driveConfig;
   NeutralOut neutralOut;
+  Slot0Configs driveGains;
+  TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+  static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
+  static final Current kSlipCurrent = Amps.of(120);//TODO needs to be tuned
+  static final CANcoderConfiguration cancoderInitialConfigs = new CANcoderConfiguration();
+  static final CANBus kCANBus = new CANBus("rio", "./logs/example.hoot");
+  public static SwerveDrivetrainConstants drivetrainConstants = new SwerveDrivetrainConstants();
+  private static Pigeon2Configuration pigeonConfigs = null;
+  private static SwerveModuleConstantsFactory constantCreator = new SwerveModuleConstantsFactory();
+
+
 
   static SparkMax steerMotor;
   final SparkClosedLoopController turningPidController;
   RelativeEncoder steerMotorEncoder;
-  CANcoder absoluteEncoder;
-  boolean absoluteEncoderReversed;
   final ClosedLoopConfig steerConfig2;
   final SparkMaxConfig steerConfig;
 
@@ -69,22 +90,57 @@ public class Module extends SubsystemBase{
     // driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // drivePidController = driveMotor.getClosedLoopController();
     
-     driveMotor = new TalonFX(driveNum, "rio");
-     driveConfig = new TalonFXConfiguration();
-     velocityRequest = new VelocityVoltage(0).withSlot(0);
-     motionMagicRequest = new MotionMagicVelocityVoltage(0);
+    driveGains = new Slot0Configs().withKP(0.1).withKI(0).withKD(0).withKS(0).withKV(0.124);
+   
+    driveMotor = new TalonFX(driveNum, "rio");
 
-     driveConfig.Slot0.kS = Constants.constants_Module.kS_Drive;
-     driveConfig.Slot0.kV = Constants.constants_Module.kV_Drive;
-     driveConfig.Slot0.kA = Constants.constants_Module.kA_Drive;
-     driveConfig.Slot0.kP = Constants.constants_Module.kP_Drive;
-     driveConfig.Slot0.kI = Constants.constants_Module.kI_Drive;
-     driveConfig.Slot0.kD = Constants.constants_Module.kD_Drive;
+    drivetrainConstants =
+      new SwerveDrivetrainConstants()
+          .withCANBusName(kCANBus.getName())
+          .withPigeon2Id(Constants.constants_Drive.kPigeonId)
+          .withPigeon2Configs(pigeonConfigs);
 
-     driveConfig.MotionMagic.MotionMagicAcceleration = 400;
-     driveConfig.MotionMagic.MotionMagicJerk = 4000;
+   constantCreator =
+      new SwerveModuleConstantsFactory()
+          .withDriveMotorGearRatio(constants_Module.kDriveMotorGearRatio)
+          .withSteerMotorGearRatio(constants_Module.kTurningMotorGearRatio)
+          .withCouplingGearRatio(constants_Module.kCoupleRatio)
+          .withWheelRadius(constants_Drive.wheelRadius.magnitude())
+          // .withSteerMotorGains(steerGains)
+          .withDriveMotorGains(driveGains)
+          // .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
+          .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
+          .withSlipCurrent(kSlipCurrent)
+          .withSpeedAt12Volts(constants_Drive.kSpeedAt12Volts)
+          // .withFeedbackSource(kSteerFeedbackType)
+          .withDriveMotorInitialConfigs(driveConfig)
+          // .withSteerMotorInitialConfigs(steerInitialConfigs)
+          .withCANcoderInitialConfigs(cancoderInitialConfigs)
+          // .withSteerInertia(kSteerInertia)
+          .withDriveInertia(constants_Sim.kDriveInertia)
+          // .withSteerFrictionVoltage(kSteerFrictionVoltage)
+          .withDriveFrictionVoltage(constants_Sim.kDriveFrictionVoltage);
 
-     driveMotor.getConfigurator().apply(driveConfig);
+
+
+
+
+
+
+    velocityRequest = new VelocityVoltage(0).withSlot(0);
+    motionMagicRequest = new MotionMagicVelocityVoltage(0);
+
+    driveConfig.Slot0.kS = Constants.constants_Module.kS_Drive;
+    driveConfig.Slot0.kV = Constants.constants_Module.kV_Drive;
+    driveConfig.Slot0.kA = Constants.constants_Module.kA_Drive;
+    driveConfig.Slot0.kP = Constants.constants_Module.kP_Drive;
+    driveConfig.Slot0.kI = Constants.constants_Module.kI_Drive;
+    driveConfig.Slot0.kD = Constants.constants_Module.kD_Drive;
+
+    driveConfig.MotionMagic.MotionMagicAcceleration = 400;
+    driveConfig.MotionMagic.MotionMagicJerk = 4000;
+
+    driveMotor.getConfigurator().apply(driveConfig);
 
 
     //Steer Motor Configs
@@ -108,8 +164,8 @@ public class Module extends SubsystemBase{
 
     
     //Absolute Encoder
-    this.absoluteEncoderReversed = absoluteEncoderReversed;
-    absoluteEncoder = new CANcoder(absoluteEncoderId);
+    // this.absoluteEncoderReversed = absoluteEncoderReversed;
+    // absoluteEncoder = new CANcoder(absoluteEncoderId);
     
     //Steer + Drive Motor Encoder
     // driveMotorEncoder = driveMotor.getEncoder();
