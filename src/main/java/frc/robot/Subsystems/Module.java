@@ -1,7 +1,6 @@
 package frc.robot.Subsystems;
 
 import frc.robot.Constants;
-import frc.robot.Constants.constants_Drive;
 import frc.robot.Constants.constants_Module;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -89,7 +88,6 @@ public class Module extends SubsystemBase{
 
     //Steer Motor Configs
     steerMotor = new SparkMax(steerNum, MotorType.kBrushless);
-    steerMotor.setInverted(invertSteer);
 
     steerConfig2 = new ClosedLoopConfig();
     steerConfig2.pidf(constants_Module.kPTurning, constants_Module.kITurning, constants_Module.kDTurning, constants_Module.kFFTurning, ClosedLoopSlot.kSlot0);
@@ -101,6 +99,7 @@ public class Module extends SubsystemBase{
     steerConfig.idleMode(IdleMode.kBrake);
     steerConfig.encoder.positionConversionFactor(constants_Module.kTurningConversionFactor2Deg);
     steerConfig.encoder.velocityConversionFactor(constants_Module.kTurningEncoderRPM2DegPerSec);
+    steerConfig.inverted(invertSteer);
 
     steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     turningPidController = steerMotor.getClosedLoopController();
@@ -135,7 +134,8 @@ public class Module extends SubsystemBase{
   }
 
   public double getAbsoluteEncoderDeg(double AEOffset) {
-    double angle = absoluteEncoder.getPosition().getValueAsDouble();
+    // double angle = absoluteEncoder.getPosition().getValueAsDouble();
+    double angle = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
     angle *= 360;
     return (angle  * (absoluteEncoderReversed ? -1 : 1) - AEOffset) % 720;
   }

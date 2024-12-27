@@ -189,20 +189,20 @@ public class Swerve extends SubsystemBase{
                SmartDashboard.putNumber("Robot Heading", getHeading());
               
                //AE Degrees Reading
-            //     SmartDashboard.putNumber("Back Left AE Value", backLeftModule.getAbsoluteEncoderDeg(constants_Drive.kBLDegrees));
-            //     SmartDashboard.putNumber("Back Right AE Value", backRightModule.getAbsoluteEncoderDeg(constants_Drive.kBRDegrees));
-            //     SmartDashboard.putNumber("Front Left AE Value", frontLeftModule.getAbsoluteEncoderDeg(constants_Drive.kFLDegrees));
-            //     SmartDashboard.putNumber("Front Right AE Value", frontRightModule.getAbsoluteEncoderDeg(constants_Drive.kFRDegrees));
+                SmartDashboard.putNumber("Back Left AE Value", backLeftModule.getAbsoluteEncoderDeg(constants_Drive.kBLDegrees));
+                SmartDashboard.putNumber("Back Right AE Value", backRightModule.getAbsoluteEncoderDeg(constants_Drive.kBRDegrees));
+                SmartDashboard.putNumber("Front Left AE Value", frontLeftModule.getAbsoluteEncoderDeg(constants_Drive.kFLDegrees));
+                SmartDashboard.putNumber("Front Right AE Value", frontRightModule.getAbsoluteEncoderDeg(constants_Drive.kFRDegrees));
             // //   //RE Degrees Reading
-            //     SmartDashboard.putNumber("Back left RE Value", backLeftModule.getSteerPosition());
-            //     SmartDashboard.putNumber("Back Right RE Value", backRightModule.getSteerPosition());
-            //     SmartDashboard.putNumber("Front left RE Value", frontLeftModule.getSteerPosition());
-            //     SmartDashboard.putNumber("Front Right RE Value", frontRightModule.getSteerPosition());
+                SmartDashboard.putNumber("Back left RE Value", backLeftModule.getSteerPosition());
+                SmartDashboard.putNumber("Back Right RE Value", backRightModule.getSteerPosition());
+                SmartDashboard.putNumber("Front left RE Value", frontLeftModule.getSteerPosition());
+                SmartDashboard.putNumber("Front Right RE Value", frontRightModule.getSteerPosition());
             //  //RE Distance Reading
-            //    SmartDashboard.putNumber("Front Left Drive Position", frontLeftModule.getDrivePosition());
-            //    SmartDashboard.putNumber("Front Right Drive Position", frontRightModule.getDrivePosition());
-            //    SmartDashboard.putNumber("Back Left Drive Position", backLeftModule.getDrivePosition());
-            //    SmartDashboard.putNumber("Back Right Drive Position", backRightModule.getDrivePosition());
+               SmartDashboard.putNumber("Front Left Drive Position", frontLeftModule.getPositionMeters());
+               SmartDashboard.putNumber("Front Right Drive Position", frontRightModule.getPositionMeters());
+               SmartDashboard.putNumber("Back Left Drive Position", backLeftModule.getPositionMeters());
+               SmartDashboard.putNumber("Back Right Drive Position", backRightModule.getPositionMeters());
             
 
             //  flModPos = new SwerveModulePosition(frontLeftModule.getPositionMeters(), frontLeftModule.gState().angle);

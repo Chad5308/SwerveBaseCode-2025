@@ -31,7 +31,6 @@ public final class Constants {
     public static final Measure<DistanceUnit> wheelRadius = edu.wpi.first.units.Units.Inches.of(1.5);
     // public static final double wheelRadius = Units.inchesToMeters(1.5);
     public static final double COF = 1.2;
-    //TODO Input trackWidth and WheelBase measurements
     public static final double kTrackWidth = Units.inchesToMeters(23.75);
       // Distance between right and left wheels
     public static final double kWheelBase = Units.inchesToMeters(23.75);
@@ -43,30 +42,30 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2)); //back right
 
 
-    //TODO Configure all motor controller CAN Bus ports
+ 
     //start front front left to front right to back right and all drives then all steers then all absolutes
-    public static final int kFrontLeftTurningMotorPort = 7;//2
-    public static final int kFrontLeftDriveMotorPort = 8;//1
-    public static final int kFrontLeftDriveAbsoluteEncoderPort = 10;//10
+    public static final int kFrontLeftTurningMotorPort = 1;
+    public static final int kFrontLeftDriveMotorPort = 1;
+    public static final int kFrontLeftDriveAbsoluteEncoderPort = 1;
     
-    public static final int kFrontRightTurningMotorPort = 3;//6
-    public static final int kFrontRightDriveMotorPort = 4;//5
-    public static final int kFrontRightDriveAbsoluteEncoderPort = 11; //11
-
-    public static final int kBackLeftTurningMotorPort = 6; //3
-    public static final int kBackLeftDriveMotorPort = 5; //4
-    public static final int kBackLeftDriveAbsoluteEncoderPort = 12; //12
-
-    public static final int kBackRightTurningMotorPort = 2; //7
-    public static final int kBackRightDriveMotorPort = 1; //8
-    public static final int kBackRightDriveAbsoluteEncoderPort = 9;//13
+    public static final int kFrontRightTurningMotorPort = 2;
+    public static final int kFrontRightDriveMotorPort = 2;
+    public static final int kFrontRightDriveAbsoluteEncoderPort = 2;
     
+    public static final int kBackRightTurningMotorPort = 3;
+    public static final int kBackRightDriveMotorPort = 3;
+    public static final int kBackRightDriveAbsoluteEncoderPort = 3;
 
+    public static final int kBackLeftTurningMotorPort = 4;
+    public static final int kBackLeftDriveMotorPort = 4;
+    public static final int kBackLeftDriveAbsoluteEncoderPort = 4;
+
+    
     //TODO Test and input all module offsets
-    public static final double kFLDegrees = 131.396484375;
-    public static final double kFRDegrees = -111.4453125;
-    public static final double kBLDegrees = 152.2265625;
-    public static final double kBRDegrees = 4.5703125;
+    public static final double kFLDegrees = 0;
+    public static final double kFRDegrees = 0;
+    public static final double kBLDegrees = 0;
+    public static final double kBRDegrees = 0;
 
 
     //TODO Invert any motor to match controller output
@@ -85,7 +84,7 @@ public final class Constants {
     public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
     public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-    public static final double kPhysicalMaxSpeedMetersPerSecond = 4.60248; //6.949 for Swerve X, 4.60248 for sd
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 6.949; //6.949 for Swerve X, 4.60248 for sd
     public static final LinearVelocityUnit kMaxTestedSpeed = LinearVelocityUnit.combine(edu.wpi.first.units.Units.Meters.of(4.5).unit(), edu.wpi.first.units.Units.Seconds.of(1).unit());
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond =kPhysicalMaxSpeedMetersPerSecond/(kTrackWidth/2);
 
@@ -112,11 +111,11 @@ public final class Constants {
     public static final double kFFTurning = 0;
 
     public static final double kS_Drive = 0.4;
-    public static final double kV_Drive = 0.12;
+    public static final double kV_Drive = 0.124;
     public static final double kA_Drive = 0.1;
-    public static final double kP_Drive = 1.0;
+    public static final double kP_Drive = 0.1;
     public static final double kI_Drive = 0;
-    public static final double kD_Drive = 0.01;
+    public static final double kD_Drive = 0.1;
 
     public static final double moduleRadius = Units.inchesToMeters(Constants.constants_Drive.kTrackWidth/2); //measured from center of robot to furthest module.
   }

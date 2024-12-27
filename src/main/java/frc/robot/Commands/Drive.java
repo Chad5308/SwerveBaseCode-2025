@@ -47,7 +47,7 @@ public class Drive extends Command{
 
     @Override
     public void initialize() {
-     s_Swerve.faceAllFoward();
+    //  s_Swerve.faceAllFoward();
     }
 
  
@@ -89,7 +89,8 @@ public class Drive extends Command{
         {
             if(fieldOriented)
             {
-                chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, turningSpeed, s_Swerve.geRotation2d());
+                chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turningSpeed);
+                chassisSpeeds.toFieldRelativeSpeeds(s_Swerve.geRotation2d());
             }else
             {
                 chassisSpeeds = new ChassisSpeeds(ySpeed, xSpeed, turningSpeed);
